@@ -1,1 +1,17 @@
 @import "tailwindcss";
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #a78bfa 0%, #f472b6 100%);
+  border-radius: 8px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #c084fc 0%, #fb7185 100%);
+}
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #a78bfa #f3e8ff;
+}

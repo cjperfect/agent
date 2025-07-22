@@ -83,8 +83,18 @@ const App = () => {
         }
         return newMsgs;
       });
-    } catch (error) {
-      setMessages((msgs) => [...msgs, { role: "assistant", content: `请求失败: ${error.message}` }]);
+    } catch {
+      setMessages((msgs) => {
+        // 替换最后一条 assistant 消息内容
+        const newMsgs = [...msgs];
+        for (let i = newMsgs.length - 1; i >= 0; i--) {
+          if (newMsgs[i].role === "assistant") {
+            newMsgs[i] = { ...newMsgs[i], content: `服务器繁忙，请稍后再试！` };
+            break;
+          }
+        }
+        return newMsgs;
+      });
     } finally {
       setLoading(false);
     }

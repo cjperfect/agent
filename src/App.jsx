@@ -3,6 +3,9 @@ import Header from "./components/Header";
 import ChatContainer from "./components/ChatContainer";
 import MessageList from "./components/MessageList";
 import ChatInput from "./components/ChatInput";
+import TableView from "./components/TableView";
+import * as XLSX from "xlsx";
+import { AnimatePresence } from "framer-motion";
 
 const URL = "http://localhost:5678/webhook-test/upload";
 
@@ -14,6 +17,7 @@ const App = () => {
   const listRef = useRef(null);
   // 已不需要上传弹窗
   const [dragActive, setDragActive] = useState(false);
+  const [tableData, setTableData] = useState(null);
 
   // 自动滚动到底部
   useEffect(() => {
@@ -89,18 +93,31 @@ const App = () => {
   const handleUpload = async ({ file }) => {
     const formData = new FormData();
     formData.append("data", file);
-    // 获取文件扩展名
     const ext = file.name.slice(file.name.lastIndexOf(".") + 1).toLowerCase();
-    // 1. 插入“正在分析中”消息
+    const isTableFile = ["xlsx", "xls", "csv"].includes(ext);
     const pendingId = Date.now() + Math.random();
     setMessages((msgs) => [...msgs, { id: pendingId, role: "assistant", content: "正在分析中，请稍等..." }]);
+    let parsedData = null;
+    if (isTableFile) {
+      try {
+        // 解析表格文件
+        const data = await file.arrayBuffer();
+        const workbook = XLSX.read(data, { type: "array" });
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+        parsedData = XLSX.utils.sheet_to_json(worksheet);
+        setTableData(parsedData);
+      } catch {
+        // 本地解析失败才隐藏表格
+        setTableData(null);
+      }
+    }
     try {
       const res = await fetch(`${URL}?type=${ext}`, {
         method: "POST",
         body: formData,
       });
       if (!res.ok) throw new Error("上传失败");
-      // 假设接口返回文本内容
       const result = await res.text();
       setMessages((msgs) =>
         msgs.map((msg) => (msg.id === pendingId ? { ...msg, content: JSON.parse(result).data.output } : msg))
@@ -110,6 +127,7 @@ const App = () => {
       setMessages((msgs) =>
         msgs.map((msg) => (msg.id === pendingId ? { ...msg, content: "文件上传失败: " + e.message } : msg))
       );
+      // fetch 失败时不影响表格显示
       return false;
     }
   };
@@ -119,14 +137,29 @@ const App = () => {
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-purple-200 via-pink-100 to-blue-100">
       <Header />
-      <ChatContainer>
-        <div className="flex flex-col flex-1" style={{ minHeight: 0 }}>
-          <div ref={listRef} className="overflow-y-auto flex-1">
-            <MessageList messages={messages} loading={loading} dragActive={dragActive} />
-          </div>
-          <ChatInput onSend={handleSend} dragActive={dragActive} loading={loading} />
+      <div className="flex flex-1 p-4 gap-4">
+        {/* 左侧表格区 */}
+        <AnimatePresence mode="wait">
+          {tableData ? (
+            <div className="w-1/2 h-[91vh] flex flex-col" style={{ minHeight: 0 }}>
+              <div className="flex-1 overflow-auto" style={{ maxHeight: "100%" }}>
+                <TableView data={tableData} />
+              </div>
+            </div>
+          ) : null}
+        </AnimatePresence>
+        {/* 右侧聊天区 */}
+        <div className={`flex-1 flex flex-col h-full ${tableData ? "w-1/2" : ""}`} style={{ minHeight: 0 }}>
+          <ChatContainer>
+            <div className="flex flex-col flex-1" style={{ minHeight: 0 }}>
+              <div ref={listRef} className="overflow-y-auto flex-1">
+                <MessageList messages={messages} loading={loading} dragActive={dragActive} />
+              </div>
+              <ChatInput onSend={handleSend} dragActive={dragActive} loading={loading} />
+            </div>
+          </ChatContainer>
         </div>
-      </ChatContainer>
+      </div>
     </div>
   );
 };

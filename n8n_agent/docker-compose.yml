@@ -6,7 +6,8 @@ services:
     ports:
       - "5678:5678"
     volumes:
-      - C:/Users/DELL/Desktop/data-agent/n8n_agent/data:/data
+      - C:/Users/ChenJiang/Desktop/agent/data:/data
+      # - C:/Users/DELL/Desktop/data-agent/n8n_agent/data:/data
     environment:
       - N8N_BASIC_AUTH_ACTIVE=true
       - N8N_BASIC_AUTH_USER=admin

@@ -1,0 +1,447 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=# 角色\n你是一位资深的数据专家，在数据处理与分析领域经验丰富。当用户提供 Excel 文件时，你能凭借专业能力进行精准剖析，给出全面详尽的总结以及极具建设性的建议，还能生成直观形象的图表。\n\n## 技能\n### 技能 1: 分析 Excel 文件\n1. 当用户提供 Excel 文件后，仔细且全面地读取文件中的数据。\n2. 运用专业方法对数据进行深入分析，涵盖数据的趋势走向、异常值排查、相关性探究等各个方面。\n3. 给出条理清晰、内容详实的总结，详细阐述数据的主要特征以及关键发现。\n4. 根据深入分析的结果，提出贴合实际、合理且针对性强的建议。\n5. 生成直观明了的图表（如柱状图、折线图、饼图等）来清晰展示数据的关键信息。\n\n用户数据如下:\n{{ $json.content }}\n\n===回复示例===\n- **总结**：[详细阐述数据情况，包括各项关键指标和显著特点]\n- **建议**：[根据数据特征和发现，提出具体且具有可操作性的建议]\n- **图表**：[以恰当的方式展示生成的图表，如附上清晰的图片链接或使用规范的 markdown 绘图语法]\n===示例结束===\n\n\n### 技能 2: 对数据深度分析\n1. 当用户对上一次结果不满意并提出新的需求时，依据用户需求重新进行精准分析，提供准确无误的结果。\n\n\n### 要求\n1. 分析并解释文件中的数据, 提供清晰、简明的分析结论\n2. 如需生成图表，请将数据转换为符合QuickChartJSON格式。以便可以直接用于QuickChart的URL请求。\n3. 不能出现报错的情况, 例如: chart Error.\n4. 输出结果的数据单位要正确符合常理. \n5. 返回图表时，请使用markdown格式内联嵌入图像，例如：![图表](图表URL)\n\n## 限制:\n- 输出的总结、建议和图表必须清晰准确，与数据实际情况高度吻合。\n- 聊天内容要积极向上、充满正能量，杜绝不恰当或毫无意义的回复。\n- 生成的图表要能够有效、直观地展示数据的关键信息。 ",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        768,
+        640
+      ],
+      "id": "af868a4e-1177-49bc-9c01-ccac97977365",
+      "name": "AI Agent",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "upload",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*",
+          "binaryPropertyName": "data",
+          "rawBody": true
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -928,
+        160
+      ],
+      "id": "9f2fb1fb-2fc2-4196-8515-59b6bec75c7e",
+      "name": "Webhook",
+      "webhookId": "0c2e5fda-e69e-40f6-9970-db050d5f2969"
+    },
+    {
+      "parameters": {
+        "options": {
+          "responseCode": 200,
+          "responseKey": "data"
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1504,
+        208
+      ],
+      "id": "32747093-76bf-44f4-8dd6-fbb2fd0e9363",
+      "name": "Respond to Webhook",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "binaryPropertyName": "data0",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        416,
+        0
+      ],
+      "id": "2b5157ed-1417-4d24-9270-6557a970fcf5",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.query.type }}",
+                    "rightValue": "xlsx",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "d9225ef2-fdc0-4579-8d2b-d3b3bf4a6bf3"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "961217af-1409-406b-9e33-c899c73eb03a",
+                    "leftValue": "={{ $json.query.type }}",
+                    "rightValue": "xls",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "24ac4199-2813-4948-b4dc-458e84b0d802",
+                    "leftValue": "={{ $json.query.type }}",
+                    "rightValue": "csv",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {
+          "ignoreCase": true
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        80,
+        112
+      ],
+      "id": "43c95503-8704-4d2f-900e-535a4cf73100",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "operation": "xls",
+        "binaryPropertyName": "data0",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        416,
+        192
+      ],
+      "id": "da2de115-ecd0-43d3-986f-dab8001a21e7",
+      "name": "Extract from File1"
+    },
+    {
+      "parameters": {
+        "binaryPropertyName": "data0",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        416,
+        400
+      ],
+      "id": "8f5e6474-94a6-4728-a805-142a381a6844",
+      "name": "Extract from File2"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        736,
+        912
+      ],
+      "id": "839b836c-f4db-4fa4-957d-6728ed51cc73",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "mJOLPnPqJbZpYu9Z",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = [];\nfor (const item of $input.all()) {\n  data.push(item.json);\n}\nreturn [\n  {\n    sessionId: $now,\n    content: JSON.stringify(data),\n  },\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        736,
+        192
+      ],
+      "id": "5b18c578-1713-4635-b6b1-295b6a5585de",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "6514818f-7807-4e47-8801-bfdabeae996e",
+              "leftValue": "={{ $json.query.type }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {
+          "ignoreCase": true
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -656,
+        160
+      ],
+      "id": "4385d15c-38c3-4c01-87f0-a40d731adadd",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  output: $input.first().json.output,\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1280,
+        432
+      ],
+      "id": "47e7acc8-edb5-45dc-99c4-9277d49895b2",
+      "name": "响应结果处理"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $now }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        896,
+        928
+      ],
+      "id": "1edf95c4-f3a0-4040-948a-42ade1a54f83",
+      "name": "Simple Memory"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "响应结果处理",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Extract from File1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Extract from File2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File1": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File2": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond to Webhook": {
+      "main": [
+        [],
+        []
+      ]
+    },
+    "响应结果处理": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "4b3e987d-30c3-4619-967d-6dd812568ecd",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "d8ae7ad22b1c354fe97e82fd863f57343081e47461563dc2ec5d3f89a7b83371"
+  },
+  "id": "kTFrAmhezblS2bKh",
+  "tags": []
+}

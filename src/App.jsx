@@ -7,7 +7,9 @@ import TableView from "./components/TableView";
 import * as XLSX from "xlsx";
 import { AnimatePresence } from "framer-motion";
 
-const URL = "http://localhost:5678/webhook-test/upload";
+const URL = "http://localhost:5678/webhook/b98afb4f-8822-4b65-8634-fdd550dd46b0/chat";
+
+const sessionId = +new Date();
 
 const App = () => {
   const [messages, setMessages] = useState([
@@ -68,16 +70,18 @@ const App = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ msg: text }),
+        body: JSON.stringify({ chatInput: text, sessionId }),
       });
       if (!response.ok) throw new Error("无响应体");
-      const result = await response.text();
+
+      const result = await response.json();
+
       setMessages((msgs) => {
         // 更新最后一条 assistant 消息内容
         const newMsgs = [...msgs];
         for (let i = newMsgs.length - 1; i >= 0; i--) {
           if (newMsgs[i].role === "assistant") {
-            newMsgs[i] = { ...newMsgs[i], content: JSON.parse(result).data.output };
+            newMsgs[i] = { ...newMsgs[i], content: result.data?.output };
             break;
           }
         }
@@ -103,6 +107,7 @@ const App = () => {
   const handleUpload = async ({ file }) => {
     const formData = new FormData();
     formData.append("data", file);
+    formData.append("sessionId", sessionId);
     const ext = file.name.slice(file.name.lastIndexOf(".") + 1).toLowerCase();
     const isTableFile = ["xlsx", "xls", "csv"].includes(ext);
     const pendingId = Date.now() + Math.random();
@@ -123,15 +128,13 @@ const App = () => {
       }
     }
     try {
-      const res = await fetch(`${URL}?type=${ext}`, {
+      const res = await fetch(URL, {
         method: "POST",
         body: formData,
       });
       if (!res.ok) throw new Error("上传失败");
-      const result = await res.text();
-      setMessages((msgs) =>
-        msgs.map((msg) => (msg.id === pendingId ? { ...msg, content: JSON.parse(result).data.output } : msg))
-      );
+      const result = await res.json();
+      setMessages((msgs) => msgs.map((msg) => (msg.id === pendingId ? { ...msg, content: result.data.output } : msg)));
       return true;
     } catch (e) {
       setMessages((msgs) =>
@@ -147,12 +150,12 @@ const App = () => {
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-purple-200 via-pink-100 to-blue-100">
       <Header />
-      <div className="flex flex-1 p-4 gap-4">
+      <div className="flex flex-1 gap-4 p-4">
         {/* 左侧表格区 */}
         <AnimatePresence mode="wait">
           {tableData ? (
             <div className="w-1/2 h-[91vh] flex flex-col" style={{ minHeight: 0 }}>
-              <div className="flex-1 overflow-auto" style={{ maxHeight: "100%" }}>
+              <div className="overflow-auto flex-1" style={{ maxHeight: "100%" }}>
                 <TableView data={tableData} />
               </div>
             </div>

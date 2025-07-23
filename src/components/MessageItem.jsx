@@ -8,8 +8,8 @@ const MessageItem = ({ role, content }) => {
   const [fullVisible, setFullVisible] = useState(false); // 控制DOM挂载
   const [animatingIn, setAnimatingIn] = useState(false); // 控制入场动画
   const contentLength = content.length;
-  const shouldShowMore = !isUser && contentLength > 500;
-  const displayContent = shouldShowMore && !showFullContent ? content.slice(0, 500) + "..." : content;
+  const shouldShowMore = !isUser && contentLength > 300;
+  const displayContent = shouldShowMore && !showFullContent ? content.slice(0, 300) + "..." : content;
   const closeTimeout = useRef();
 
   // ESC键关闭弹窗
@@ -53,16 +53,14 @@ const MessageItem = ({ role, content }) => {
         )}
         <div
           className={`max-w-[70%] px-4 py-2 rounded-2xl shadow-md text-base whitespace-pre-line ${
-            isUser
-              ? "bg-gradient-to-r from-pink-400 to-orange-300 text-white ml-8"
-              : "bg-white text-gray-800 mr-8"
+            isUser ? "bg-gradient-to-r from-pink-400 to-orange-300 text-white ml-8" : "bg-white text-gray-800 mr-8"
           }`}
         >
           {isUser ? (
             content
           ) : (
             <>
-              <div className="markdown-body">
+              <div className="prose prose-sm max-w-none prose-h1:text-2xl prose-h2:text-xl prose-h3:text-lg prose-p:my-1 prose-h1:my-3 prose-h2:my-2 prose-h3:my-1 prose-ul:my-1 prose-ol:my-1 prose-li:my-0.5 prose-pre:my-1 prose-table:my-1">
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>{displayContent}</ReactMarkdown>
               </div>
               {shouldShowMore && !showFullContent && (
@@ -110,17 +108,12 @@ const MessageItem = ({ role, content }) => {
                     viewBox="0 0 24 24"
                     stroke="currentColor"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </button>
               </div>
               <div className="flex-1 overflow-y-auto p-6 bg-gray-50">
-                <div className="markdown-body prose max-w-none bg-white rounded-lg p-6 shadow-sm">
+                <div className="prose prose-sm max-w-none bg-white rounded-lg p-6 shadow-sm prose-h1:text-2xl prose-h2:text-xl prose-h3:text-lg prose-p:my-1 prose-h1:my-3 prose-h2:my-2 prose-h3:my-1 prose-ul:my-1 prose-ol:my-1 prose-li:my-0.5 prose-pre:my-1 prose-table:my-1">
                   <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
                 </div>
               </div>
@@ -132,4 +125,4 @@ const MessageItem = ({ role, content }) => {
   );
 };
 
-export default MessageItem; 
+export default MessageItem;

@@ -1,0 +1,608 @@
+{
+  "name": "main",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=用户发送消息: {{$json.chatInput}}\n上传文件的数据: {{ $json.content }}\n\n如果用户提供了文件, 请通过数据{{ $json.content }}进行分析统计，并给出建议，尽量给出配套的图表\n如果用户发送了消息{{$json.chatInput}}，就需要根据用户的需求进行回复。\n",
+        "options": {
+          "systemMessage": "=# 🎓 角色定位：资深数据分析专家\n\n你是一位经验丰富、技术精湛的 **数据分析专家**，专精于 Excel 数据的解析、可视化与业务洞察。你擅长从纷繁复杂的数据中提炼出核心价值，不仅能输出清晰、全面的分析报告，还能给出具备实操性的建议与可视化图表，助力业务高效决策。\n\n---\n\n## 🧠 核心技能\n\n### 🔍 技能 1：Excel 文件分析能力\n\n当用户上传 Excel 文件时，你将：\n\n1. **精确读取并解析**各个工作表的数据，识别字段、数据类型与结构；\n2. 对数据进行多维度分析，包括但不限于：\n   - 数据分布与集中趋势（平均值、中位数、极值等）\n   - 异常值识别与处理建议\n   - 时间序列趋势变化\n   - 指标间相关性与聚类特征\n   - 类别变量统计与排名\n3. 输出结构严谨的总结报告，包含：\n   - 数据特征与关键指标\n   - 显著发现与潜在风险\n   - 潜在业务机会\n4. 提出具备**可执行性**与**业务价值**的策略建议；\n5. 生成适配业务场景的**可视化图表**（柱状图、折线图、饼图、散点图等）辅助理解，确保图表**重点突出、逻辑清晰、便于决策**。\n\n---\n\n### 🛠 技能 2：深度定制化分析\n\n当用户提出具体分析需求或对初始结果不满意时，你将：\n\n1. 快速理解并精准匹配用户意图；\n2. 重新制定分析策略并更新图表展示逻辑；\n3. 支持进阶分析需求，如：\n   - 预测建模（如趋势预测、回归分析）\n   - 多维交叉分析（如某变量在不同维度下的对比）\n   - 自动生成摘要与洞察提示\n\n---\n\n\n## 📈 分析输出结构\n\n每次分析结果应包含以下内容：\n\n### ✅ 1. 总结\n\n> **总结**：简洁明确地描述数据特征、指标表现、趋势规律与核心发现。\n\n示例：\n\n> 在过去 6 个月中，销售额持续增长，月均增长率为 12.6%。其中 5 月增长最显著，环比提升 32%。地区维度上，华东地区销售占比达 42%，为主要增长动力。\n\n---\n\n### ✅ 2. 建议\n\n> **建议**：结合数据现象提出具有业务价值的建议，内容务实可执行。\n\n示例：\n\n> 建议对华东地区加大资源投放，复制 5 月的营销策略以提升 Q4 业绩；针对退货率偏高的区域，可提升售后体验及产品说明优化。\n\n---\n\n### ✅ 3. 图表展示\n\n> **图表**：如需生成图表，请将数据转换为QuickChart的JSON格式，请确保生成的JSON结构能够被QuickChart所使用，不能嵌套额外的属性，以便于可以直接用于QuickChart的URL请求\n\n返回图表时，请使用Markdown格式内嵌图像，例如：\n\n![图表](https://quickchart.io/chart?c={type:'bar',data:{labels:['华东','华南','华北'],datasets:[{label:'销售额',data:[320000,210000,180000]}]}})\n\n---\n\n\n\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        384,
+        544
+      ],
+      "id": "a3dabd57-f4d5-47ea-ac24-349d610bd854",
+      "name": "AI Agent",
+      "alwaysOutputData": false,
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"code\": 200,\n  \"data\":{\n    \"output\": {{ JSON.stringify($json.output) }}\n  }\n} ",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        816,
+        368
+      ],
+      "id": "0a024b57-9463-4c6f-9955-e9829b126584",
+      "name": "Respond to Webhook",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "binaryPropertyName": "data0",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        -320,
+        0
+      ],
+      "id": "c3b99d8a-f987-497a-a268-2f6b63d983cb",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.files[0].fileExtension }}",
+                    "rightValue": "xlsx",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "d9225ef2-fdc0-4579-8d2b-d3b3bf4a6bf3"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "961217af-1409-406b-9e33-c899c73eb03a",
+                    "leftValue": "=",
+                    "rightValue": "xls",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "24ac4199-2813-4948-b4dc-458e84b0d802",
+                    "leftValue": "=",
+                    "rightValue": "csv",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {
+          "ignoreCase": true
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -544,
+        176
+      ],
+      "id": "8a4f7595-2e0e-47b2-94d6-5764dd72200f",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "operation": "xls",
+        "binaryPropertyName": "data0",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        -320,
+        192
+      ],
+      "id": "bfd4a53b-9048-4d9b-8236-dd48e6c54aae",
+      "name": "Extract from File1"
+    },
+    {
+      "parameters": {
+        "binaryPropertyName": "data0",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        -304,
+        368
+      ],
+      "id": "20afcf7b-69c3-4a31-acb1-8b38a499a118",
+      "name": "Extract from File2"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = [];\nfor (const item of $input.all()) {\n  data.push(item.json);\n}\nreturn [\n  {\n    content: JSON.stringify(data)\n  },\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        128,
+        192
+      ],
+      "id": "b8924a69-1d93-4750-a15c-bd70a2dfcfaa",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "6514818f-7807-4e47-8801-bfdabeae996e",
+              "leftValue": "={{ $json.files[0].fileName }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {
+          "ignoreCase": true
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -768,
+        368
+      ],
+      "id": "c335bab6-3b50-4e0c-90a7-3b6b91464dc6",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "public": true,
+        "options": {
+          "allowedOrigins": "*",
+          "allowFileUploads": true,
+          "allowedFilesMimeTypes": ".xlsx, .xls, .csv",
+          "responseMode": "responseNode"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -992,
+        368
+      ],
+      "id": "4a6dfee1-d96e-4c78-8ea1-994172392b9f",
+      "name": "When chat message received",
+      "webhookId": "b98afb4f-8822-4b65-8634-fdd550dd46b0"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('When chat message received').first().json.sessionId }}",
+        "contextWindowLength": 20
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        496,
+        720
+      ],
+      "id": "18e21a36-28da-4b44-bd1b-ae60ca943964",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatDeepSeek",
+      "typeVersion": 1,
+      "position": [
+        352,
+        720
+      ],
+      "id": "79ef2a2a-9909-4826-8206-f08e63f503ac",
+      "name": "DeepSeek Chat Model",
+      "credentials": {
+        "deepSeekApi": {
+          "id": "FveV4JWc43VxZrn3",
+          "name": "DeepSeek account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "includeOtherFields": true,
+        "include": "except",
+        "excludeFields": "id",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -96,
+        192
+      ],
+      "id": "e91a9739-69e6-4f41-a12f-538bf34e07b6",
+      "name": "排除一些无用字段"
+    },
+    {
+      "parameters": {
+        "description": "=如需生成图表,请调用相应的工具。务必正确转义所有字符串，尤其是多行内容。输出图表时，使用markdown格式嵌入图像链接，以实现图表内嵌展示。\n\n格式示例：![图表](图表URL)",
+        "workflowId": {
+          "__rl": true,
+          "value": "YX8umD5DibM5L5zU",
+          "mode": "id"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        608,
+        800
+      ],
+      "id": "75e35d7c-f0dd-4385-bd06-00973c966b39",
+      "name": "Call n8n Workflow Tool"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatDeepSeek",
+      "typeVersion": 1,
+      "position": [
+        -752,
+        1312
+      ],
+      "id": "353c8bc6-7fbc-496f-8e7f-6b5355b5af06",
+      "name": "DeepSeek Chat Model1",
+      "credentials": {
+        "deepSeekApi": {
+          "id": "FveV4JWc43VxZrn3",
+          "name": "DeepSeek account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=输入的数据: {{ $json.query }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=### 角色设定\n你是一位 Chart.js 可视化专家。你的主要任务是根据用户的请求，生成**有效、结构清晰、标签明确**的Chart.js 配置对象。这些配置应当可以直接用于 Chart.js 的构造函数'new Chart()'中。\n\n### 输入要求\n你将接收到用户关于图表的描述，请根据以下要素解析和响应:\n\n####1、图表类型\n用户可能会指定图表类型，如:`bar`(柱状图)、`line`(折线图)、`pie`(饼图)、`scatter`(散点图)radar`、`bubble、等。\n\n####2.数据\n用户提供的数据可能为 CSV、JSON、列表或自然语言形式。\n*对格式不清晰的数据，要主动提问澄清。\n*如有需要，可提取和转换数据结构。\n\n#### 3.标签信息\n用户应提供用于坐标轴、数据点等元素的标签，特别是:\n***轴标题**(如:\"月份\"，\"销售额(USD)\")\n***单位**(如:\"(kg)\"，\"(USD)\")\n***数据类型**(分类、数值型、时间序列)\n如信息缺失，请主动向用户确认。\n\n### 输出要求\n输出的结果一定是完整的，能够被使用，不能出现图片加载不出来的情况"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        -752,
+        992
+      ],
+      "id": "69449af2-5f90-422e-aad6-a2cb240a4d41",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -992,
+        992
+      ],
+      "id": "3f107e18-3b78-4874-b587-6efc7a1e6185",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"$schema\": \"http://json-schema.org/draft-07/schema#\",\n  \"title\": \"QuickChart Configuration\",\n  \"type\": \"object\",\n  \"required\": [\"type\", \"data\"],\n  \"properties\": {\n    \"type\": {\n      \"type\": \"string\",\n      \"description\": \"Chart type, e.g., bar, line, pie, radar, etc.\",\n      \"enum\": [\"bar\", \"line\", \"pie\", \"doughnut\", \"radar\", \"polarArea\"]\n    },\n    \"data\": {\n      \"type\": \"object\",\n      \"required\": [\"labels\", \"datasets\"],\n      \"properties\": {\n        \"labels\": {\n          \"type\": \"array\",\n          \"items\": {\n            \"type\": \"string\"\n          },\n          \"description\": \"Labels for the X-axis or segments\"\n        },\n        \"datasets\": {\n          \"type\": \"array\",\n          \"minItems\": 1,\n          \"items\": {\n            \"type\": \"object\",\n            \"required\": [\"label\", \"data\"],\n            \"properties\": {\n              \"label\": {\n                \"type\": \"string\",\n                \"description\": \"Label for the dataset\"\n              },\n              \"data\": {\n                \"type\": \"array\",\n                \"items\": {\n                  \"type\": \"number\"\n                },\n                \"description\": \"Data points\"\n              },\n              \"backgroundColor\": {\n                \"type\": [\"string\", \"array\"],\n                \"description\": \"Background color(s)\"\n              },\n              \"borderColor\": {\n                \"type\": [\"string\", \"array\"],\n                \"description\": \"Border color(s)\"\n              },\n              \"fill\": {\n                \"type\": [\"boolean\", \"string\"],\n                \"description\": \"Whether to fill under the line (for line chart)\"\n              },\n              \"tension\": {\n                \"type\": \"number\",\n                \"description\": \"Line tension (for line chart, 0 = straight lines)\"\n              }\n            }\n          }\n        }\n      }\n    },\n    \"options\": {\n      \"type\": \"object\",\n      \"description\": \"Chart display options\",\n      \"properties\": {\n        \"title\": {\n          \"type\": \"object\",\n          \"properties\": {\n            \"display\": { \"type\": \"boolean\" },\n            \"text\": { \"type\": \"string\" }\n          }\n        },\n        \"scales\": {\n          \"type\": \"object\",\n          \"properties\": {\n            \"x\": {\n              \"type\": \"object\",\n              \"properties\": {\n                \"title\": {\n                  \"type\": \"object\",\n                  \"properties\": {\n                    \"display\": { \"type\": \"boolean\" },\n                    \"text\": { \"type\": \"string\" }\n                  }\n                }\n              }\n            },\n            \"y\": {\n              \"type\": \"object\",\n              \"properties\": {\n                \"title\": {\n                  \"type\": \"object\",\n                  \"properties\": {\n                    \"display\": { \"type\": \"boolean\" },\n                    \"text\": { \"type\": \"string\" }\n                  }\n                },\n                \"beginAtZero\": { \"type\": \"boolean\" }\n              }\n            }\n          }\n        }\n      }\n    }\n  }\n}\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -560,
+        1296
+      ],
+      "id": "8665e0b6-e59b-4ff1-a0e4-49628557ba03",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"chartUrl\": \"https://quickchart.io/chart?c={{ encodeURIComponent(JSON.stringify($json.output)) }}\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -240,
+        992
+      ],
+      "id": "693c85be-7b64-48d0-b144-afc5e92f6785",
+      "name": "Edit Fields"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "排除一些无用字段",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Extract from File1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Extract from File2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File1": {
+      "main": [
+        [
+          {
+            "node": "排除一些无用字段",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File2": {
+      "main": [
+        [
+          {
+            "node": "排除一些无用字段",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DeepSeek Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "排除一些无用字段": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call n8n Workflow Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DeepSeek Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c215a9b8-552d-4f38-9c97-27ed0a0ceb41",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "d8ae7ad22b1c354fe97e82fd863f57343081e47461563dc2ec5d3f89a7b83371"
+  },
+  "id": "YX8umD5DibM5L5zU",
+  "tags": []
+}

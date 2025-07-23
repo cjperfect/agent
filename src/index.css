@@ -27,8 +27,14 @@
   animation-delay: 0.4s;
 }
 @keyframes blink {
-  0%, 80%, 100% { opacity: 0; }
-  40% { opacity: 1; }
+  0%,
+  80%,
+  100% {
+    opacity: 0;
+  }
+  40% {
+    opacity: 1;
+  }
 }
 .markdown-body a {
   color: #2563eb; /* tailwind blue-600 */
@@ -51,6 +57,37 @@
   box-sizing: border-box;
 }
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* 强化 markdown 标题大小和间距 */
+.prose h1 {
+  font-size: 2.25rem !important;
+  margin: 1.2em 0 0.6em !important;
+  font-weight: 800 !important;
+}
+.prose h2 {
+  font-size: 1.5rem !important;
+  margin: 1em 0 0.5em !important;
+  font-weight: 700 !important;
+}
+.prose h3 {
+  font-size: 1.25rem !important;
+  margin: 0.8em 0 0.4em !important;
+  font-weight: 600 !important;
+}
+.prose p {
+  margin: 0.3em 0 !important;
+}
+.prose ul,
+.prose ol {
+  margin: 0.3em 0 0.3em 1.5em !important;
+}
+.prose li {
+  margin: 0.1em 0 !important;
 }

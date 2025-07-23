@@ -145,8 +145,6 @@ const App = () => {
     }
   };
 
-  // 检查用户最后一条消息是否包含“上传”
-
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-purple-200 via-pink-100 to-blue-100">
       <Header />

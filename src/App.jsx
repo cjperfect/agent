@@ -112,7 +112,6 @@ const App = () => {
     const isTableFile = ["xlsx", "xls", "csv"].includes(ext);
     const pendingId = Date.now() + Math.random();
     setMessages((msgs) => [...msgs, { id: pendingId, role: "assistant", content: "正在分析中，请稍等..." }]);
-    let parsedData = null;
     if (isTableFile) {
       try {
         // 解析表格文件
@@ -120,8 +119,51 @@ const App = () => {
         const workbook = XLSX.read(data, { type: "array" });
         const sheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[sheetName];
-        parsedData = XLSX.utils.sheet_to_json(worksheet);
-        setTableData(parsedData);
+
+        // 获取工作表范围
+        const range = XLSX.utils.decode_range(worksheet["!ref"]);
+
+        console.log("Excel 数据范围:", range);
+        console.log("工作表内容:", worksheet);
+
+        // 手动构建表头和数据，处理合并单元格
+        const headers = [];
+        const tableData = [];
+
+        // 从第一行获取表头
+        for (let col = range.s.c; col <= range.e.c; col++) {
+          const cellAddress = XLSX.utils.encode_cell({ r: 0, c: col });
+          const cell = worksheet[cellAddress];
+          const headerValue = cell ? cell.v || `Column_${col + 1}` : `Column_${col + 1}`;
+          headers.push(headerValue);
+        }
+
+        console.log("解析到的表头:", headers);
+        console.log("表头数量:", headers.length);
+
+        // 从第二行开始获取数据
+        for (let row = range.s.r + 1; row <= range.e.r; row++) {
+          const rowData = {};
+          let hasData = false;
+
+          for (let col = range.s.c; col <= range.e.c; col++) {
+            const cellAddress = XLSX.utils.encode_cell({ r: row, c: col });
+            const cell = worksheet[cellAddress];
+            const cellValue = cell ? cell.v : "";
+            rowData[headers[col]] = cellValue;
+            if (cellValue !== "" && cellValue !== null && cellValue !== undefined) {
+              hasData = true;
+            }
+          }
+
+          // 只添加有数据的行
+          if (hasData) {
+            tableData.push(rowData);
+          }
+        }
+
+        console.log("解析到的数据行数:", tableData.length);
+        setTableData(tableData);
       } catch {
         // 本地解析失败才隐藏表格
         setTableData(null);

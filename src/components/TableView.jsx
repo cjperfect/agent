@@ -8,7 +8,7 @@ const TableView = ({ data }) => {
       className="overflow-auto h-full w-full bg-white rounded-2xl shadow-lg p-4 border border-gray-200"
       style={{ maxHeight: "100%" }}
     >
-      <table className="min-w-full text-sm border-separate border-spacing-0">
+      <table className="min-w-max text-sm border-separate border-spacing-0">
         <thead>
           <tr>
             {headers.map((header) => (

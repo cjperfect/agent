@@ -6,6 +6,7 @@ import ChatInput from "./components/ChatInput";
 import TableView from "./components/TableView";
 import * as XLSX from "xlsx";
 import { AnimatePresence } from "framer-motion";
+import { defaultConfig } from "./config";
 
 const URL = "http://localhost:5678/webhook/b98afb4f-8822-4b65-8634-fdd550dd46b0/chat";
 
@@ -13,7 +14,15 @@ const sessionId = +new Date();
 
 const App = () => {
   const [messages, setMessages] = useState([
-    { role: "assistant", content: "你好！我是你的AI助手，有什么可以帮你的吗？" },
+    {
+      role: "assistant",
+      content: "你好！我是你的AI助手，有什么可以帮你的吗？",
+    },
+    {
+      id: 1753503484384.542,
+      role: "assistant",
+      ...defaultConfig,
+    },
   ]);
   const [loading, setLoading] = useState(false);
   const listRef = useRef(null);
@@ -65,23 +74,28 @@ const App = () => {
     setMessages((msgs) => [...msgs, { role: "assistant", content: "" }]);
     setLoading(true);
     try {
-      const response = await fetch(URL, {
+      const res = await fetch(URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ chatInput: text, sessionId }),
       });
-      if (!response.ok) throw new Error("无响应体");
+      if (!res.ok) throw new Error("无响应体");
 
-      const result = await response.json();
+      const result = await res.json();
+      const output = result?.result;
 
       setMessages((msgs) => {
         // 更新最后一条 assistant 消息内容
         const newMsgs = [...msgs];
         for (let i = newMsgs.length - 1; i >= 0; i--) {
           if (newMsgs[i].role === "assistant") {
-            newMsgs[i] = { ...newMsgs[i], content: result.data?.output };
+            newMsgs[i] = {
+              ...newMsgs[i],
+              content: output?.content || "",
+              echartsConfig: output?.echartsOption || null,
+            };
             break;
           }
         }
@@ -123,9 +137,6 @@ const App = () => {
         // 获取工作表范围
         const range = XLSX.utils.decode_range(worksheet["!ref"]);
 
-        console.log("Excel 数据范围:", range);
-        console.log("工作表内容:", worksheet);
-
         // 手动构建表头和数据，处理合并单元格
         const headers = [];
         const tableData = [];
@@ -137,9 +148,6 @@ const App = () => {
           const headerValue = cell ? cell.v || `Column_${col + 1}` : `Column_${col + 1}`;
           headers.push(headerValue);
         }
-
-        console.log("解析到的表头:", headers);
-        console.log("表头数量:", headers.length);
 
         // 从第二行开始获取数据
         for (let row = range.s.r + 1; row <= range.e.r; row++) {
@@ -162,7 +170,6 @@ const App = () => {
           }
         }
 
-        console.log("解析到的数据行数:", tableData.length);
         setTableData(tableData);
       } catch {
         // 本地解析失败才隐藏表格
@@ -176,11 +183,22 @@ const App = () => {
       });
       if (!res.ok) throw new Error("上传失败");
       const result = await res.json();
-      setMessages((msgs) => msgs.map((msg) => (msg.id === pendingId ? { ...msg, content: result.data.output } : msg)));
-      return true;
-    } catch (e) {
+      const output = result?.result;
       setMessages((msgs) =>
-        msgs.map((msg) => (msg.id === pendingId ? { ...msg, content: "文件上传失败: " + e.message } : msg))
+        msgs.map((msg) =>
+          msg.id === pendingId
+            ? {
+                ...msg,
+                content: output.content || "",
+                echartsConfig: output?.echartsOption || null,
+              }
+            : msg
+        )
+      );
+      return true;
+    } catch {
+      setMessages((msgs) =>
+        msgs.map((msg) => (msg.id === pendingId ? { ...msg, content: "系统异常, 请再次尝试！" } : msg))
       );
       // fetch 失败时不影响表格显示
       return false;

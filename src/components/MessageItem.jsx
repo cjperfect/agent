@@ -1,15 +1,16 @@
 import React, { useState, useEffect, useRef } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import ChartView from "./ChartView";
 
-const MessageItem = ({ role, content }) => {
+const MessageItem = ({ role, content, echartsConfig }) => {
   const isUser = role === "user";
   const [showFullContent, setShowFullContent] = useState(false);
   const [fullVisible, setFullVisible] = useState(false); // 控制DOM挂载
   const [animatingIn, setAnimatingIn] = useState(false); // 控制入场动画
   const contentLength = content.length;
-  const shouldShowMore = !isUser && contentLength > 300;
-  const displayContent = shouldShowMore && !showFullContent ? content.slice(0, 300) + "..." : content;
+  const shouldShowMore = !isUser && contentLength > 200;
+  const displayContent = shouldShowMore && !showFullContent ? content.slice(0, 200) + "..." : content;
   const closeTimeout = useRef();
 
   // ESC键关闭弹窗
@@ -60,9 +61,19 @@ const MessageItem = ({ role, content }) => {
             content
           ) : (
             <>
-              <div className="prose prose-sm max-w-none prose-h1:text-2xl prose-h2:text-xl prose-h3:text-lg prose-p:my-1 prose-h1:my-3 prose-h2:my-2 prose-h3:my-1 prose-ul:my-1 prose-ol:my-1 prose-li:my-0.5 prose-pre:my-1 prose-table:my-1">
+              <div className="prose prose-sm max-w-none prose-h1:text-2xl prose-h2:text-xl prose-h3:text-lg prose-p:my-0.5 prose-h1:my-2 prose-h2:my-1.5 prose-h3:my-1 prose-ul:my-0.5 prose-ol:my-0.5 prose-li:my-0 prose-pre:my-0.5 prose-table:my-0.5 prose-blockquote:my-0.5 prose-hr:my-1">
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>{displayContent}</ReactMarkdown>
               </div>
+
+              {/* 渲染 ECharts 图表 */}
+              {!shouldShowMore && echartsConfig && Array.isArray(echartsConfig) && echartsConfig.length > 0 && (
+                <div className="mt-4 space-y-4">
+                  {echartsConfig.map((chartConfig, index) => (
+                    <ChartView key={index} config={chartConfig} />
+                  ))}
+                </div>
+              )}
+
               {shouldShowMore && !showFullContent && (
                 <button
                   onClick={handleShowFull}
@@ -116,6 +127,18 @@ const MessageItem = ({ role, content }) => {
                 <div className="prose prose-sm max-w-none bg-white rounded-lg p-6 shadow-sm prose-h1:text-2xl prose-h2:text-xl prose-h3:text-lg prose-p:my-1 prose-h1:my-3 prose-h2:my-2 prose-h3:my-1 prose-ul:my-1 prose-ol:my-1 prose-li:my-0.5 prose-pre:my-1 prose-table:my-1">
                   <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
                 </div>
+
+                {/* 全屏弹窗中的图表 */}
+                {echartsConfig && Array.isArray(echartsConfig) && echartsConfig.length > 0 && (
+                  <div className="mt-6 space-y-6 prose">
+                    <h3 class="pl-2"> 🔍 图表分析</h3>
+                    {echartsConfig.map((chartConfig, index) => (
+                      <div key={index} className="bg-white rounded-lg p-4 shadow-sm">
+                        <ChartView config={chartConfig} />
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </div>

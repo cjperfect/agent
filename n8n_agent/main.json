@@ -14,7 +14,7 @@
       "typeVersion": 2.1,
       "position": [
         384,
-        368
+        360
       ],
       "id": "a3dabd57-f4d5-47ea-ac24-349d610bd854",
       "name": "AI Agent",
@@ -33,7 +33,7 @@
       "typeVersion": 1.4,
       "position": [
         816,
-        368
+        360
       ],
       "id": "0a024b57-9463-4c6f-9955-e9829b126584",
       "name": "Respond to Webhook",
@@ -178,7 +178,7 @@
       "typeVersion": 2,
       "position": [
         128,
-        192
+        184
       ],
       "id": "b8924a69-1d93-4750-a15c-bd70a2dfcfaa",
       "name": "Code"
@@ -214,7 +214,7 @@
       "typeVersion": 2.2,
       "position": [
         -768,
-        368
+        360
       ],
       "id": "c335bab6-3b50-4e0c-90a7-3b6b91464dc6",
       "name": "If"
@@ -233,7 +233,7 @@
       "typeVersion": 1.1,
       "position": [
         -992,
-        368
+        360
       ],
       "id": "4a6dfee1-d96e-4c78-8ea1-994172392b9f",
       "name": "When chat message received",
@@ -249,7 +249,7 @@
       "typeVersion": 1.3,
       "position": [
         480,
-        592
+        584
       ],
       "id": "18e21a36-28da-4b44-bd1b-ae60ca943964",
       "name": "Simple Memory"
@@ -262,7 +262,7 @@
       "typeVersion": 1,
       "position": [
         352,
-        592
+        584
       ],
       "id": "79ef2a2a-9909-4826-8206-f08e63f503ac",
       "name": "DeepSeek Chat Model",
@@ -275,22 +275,6 @@
     },
     {
       "parameters": {
-        "includeOtherFields": true,
-        "include": "except",
-        "excludeFields": "id",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
-      "position": [
-        -96,
-        192
-      ],
-      "id": "e91a9739-69e6-4f41-a12f-538bf34e07b6",
-      "name": "排除一些无用字段"
-    },
-    {
-      "parameters": {
         "schemaType": "manual",
         "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"content\": {\n      \"type\": \"string\",\n      \"description\": \"数据分析总结与建议，Markdown 格式\"\n    },\n    \"echartsOption\": {\n      \"type\": \"array\",\n      \"description\": \"图表配置列表，可包含多个图表\",\n      \"items\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"summary\": {\n            \"type\": \"string\",\n            \"description\": \"图表的简要描述\"\n          },\n          \"option\": {\n            \"type\": \"object\",\n            \"description\": \"符合 Echarts.js 的图表配置\"\n          }\n        },\n        \"required\": [\"summary\", \"option\"]\n      }\n    }\n  },\n  \"required\": [\"content\", \"echartsOption\"]\n}\n"
       },
@@ -298,7 +282,7 @@
       "typeVersion": 1.3,
       "position": [
         608,
-        592
+        584
       ],
       "id": "b7b0d6f1-9c6f-4d73-9a30-d52b165ced4c",
       "name": "Structured Output Parser1"
@@ -310,8 +294,8 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatDeepSeek",
       "typeVersion": 1,
       "position": [
-        -736,
-        1024
+        -768,
+        1016
       ],
       "id": "d1eaa84a-a33e-400e-8bbf-4a4864f84b4c",
       "name": "DeepSeek Chat Model1",
@@ -330,7 +314,7 @@
       "typeVersion": 1.1,
       "position": [
         -992,
-        800
+        792
       ],
       "id": "d1297a29-1ee5-4522-bd3b-e3d5842ada03",
       "name": "When Executed by Another Workflow"
@@ -343,44 +327,11 @@
       "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
       "typeVersion": 1.3,
       "position": [
-        -608,
-        1024
+        -496,
+        1008
       ],
       "id": "972878f1-2c15-4b5c-8cc1-8f14087114a4",
       "name": "Structured Output Parser"
-    },
-    {
-      "parameters": {
-        "mode": "raw",
-        "jsonOutput": "={\n  \"chartUrl\": \"https://quickchart.io/chart?c={{ encodeURIComponent(JSON.stringify($json.output)) }}\"\n}\n",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
-      "position": [
-        -368,
-        800
-      ],
-      "id": "27795608-1b7a-4735-a2b6-b030ac4a577c",
-      "name": "Edit Fields"
-    },
-    {
-      "parameters": {
-        "promptType": "define",
-        "text": "=输入的数据: {{ $json.query }}",
-        "hasOutputParser": true,
-        "options": {
-          "systemMessage": "=### 角色设定\n你是一位 Chart.js 可视化专家。你的主要任务是根据用户的请求，生成**有效、结构清晰、标签明确**的Chart.js 配置对象。这些配置应当可以直接用于 Chart.js 的构造函数'new Chart()'中。\n\n### 输入要求\n你将接收到用户关于图表的描述，请根据以下要素解析和响应:\n\n####1、图表类型\n用户可能会指定图表类型，如:`bar`(柱状图)、`line`(折线图)、`pie`(饼图)、`scatter`(散点图)radar`、`bubble、等。\n\n####2.数据\n用户提供的数据可能为 CSV、JSON、列表或自然语言形式。\n*对格式不清晰的数据，要主动提问澄清。\n*如有需要，可提取和转换数据结构。\n\n#### 3.标签信息\n用户应提供用于坐标轴、数据点等元素的标签，特别是:\n***轴标题**(如:\"月份\"，\"销售额(USD)\")\n***单位**(如:\"(kg)\"，\"(USD)\")\n***数据类型**(分类、数值型、时间序列)\n如信息缺失，请主动向用户确认。\n\n### 输出要求\n输出的结果一定是完整的，能够被使用，不能出现图片加载不出来的情况"
-        }
-      },
-      "type": "@n8n/n8n-nodes-langchain.agent",
-      "typeVersion": 2.1,
-      "position": [
-        -768,
-        800
-      ],
-      "id": "31d5c902-140f-4392-86a8-f18151e83a37",
-      "name": "图表生成"
     },
     {
       "parameters": {
@@ -390,12 +341,60 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        -1280,
-        640
+        -1400,
+        552
       ],
       "typeVersion": 1,
       "id": "ea9e3e1e-d402-4058-8de8-e9eae08108b4",
       "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "includeOtherFields": true,
+        "include": "except",
+        "excludeFields": "id",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -96,
+        184
+      ],
+      "id": "e91a9739-69e6-4f41-a12f-538bf34e07b6",
+      "name": "exclude Fields"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=输入的数据: {{ $json.query }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=### 角色设定\n你是一位 Chart.js 可视化专家。你的主要任务是根据用户的请求，生成**有效、结构清晰、标签明确**的Chart.js 配置对象。这些配置应当可以直接用于 Chart.js 的构造函数'new Chart()'中。\n\n### 输入要求\n你将接收到用户关于图表的描述，请根据以下要素解析和响应:\n\n####1、图表类型\n用户可能会指定图表类型，如:`bar`(柱状图)、`line`(折线图)、`pie`(饼图)、`scatter`(散点图)radar`、`bubble、等。\n\n####2.数据\n用户提供的数据可能为 CSV、JSON、列表或自然语言形式。\n*对格式不清晰的数据，要主动提问澄清。\n*如有需要，可提取和转换数据结构。\n\n#### 3.标签信息\n用户应提供用于坐标轴、数据点等元素的标签，特别是:\n***轴标题**(如:\"月份\"，\"销售额(USD)\")\n***单位**(如:\"(kg)\"，\"(USD)\")\n***数据类型**(分类、数值型、时间序列)\n如信息缺失，请主动向用户确认。\n\n### 输出要求\n输出的结果一定是完整的，能够被使用，不能出现图片加载不出来的情况\n![图表说明](图表URL)"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        -736,
+        792
+      ],
+      "id": "31d5c902-140f-4392-86a8-f18151e83a37",
+      "name": "echart generate"
+    },
+    {
+      "parameters": {
+        "chartOptions": {},
+        "datasetOptions": {}
+      },
+      "type": "n8n-nodes-base.quickChartTool",
+      "typeVersion": 1,
+      "position": [
+        -640,
+        1016
+      ],
+      "id": "565fa27f-a579-4f8a-a993-6ecbfa14d704",
+      "name": "QuickChart MCP"
     }
   ],
   "pinData": {},
@@ -415,7 +414,7 @@
       "main": [
         [
           {
-            "node": "排除一些无用字段",
+            "node": "exclude Fields",
             "type": "main",
             "index": 0
           }
@@ -451,7 +450,7 @@
       "main": [
         [
           {
-            "node": "排除一些无用字段",
+            "node": "exclude Fields",
             "type": "main",
             "index": 0
           }
@@ -462,7 +461,7 @@
       "main": [
         [
           {
-            "node": "排除一些无用字段",
+            "node": "exclude Fields",
             "type": "main",
             "index": 0
           }
@@ -531,17 +530,6 @@
         ]
       ]
     },
-    "排除一些无用字段": {
-      "main": [
-        [
-          {
-            "node": "Code",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Structured Output Parser1": {
       "ai_outputParser": [
         [
@@ -557,7 +545,7 @@
       "ai_languageModel": [
         [
           {
-            "node": "图表生成",
+            "node": "echart generate",
             "type": "ai_languageModel",
             "index": 0
           }
@@ -568,7 +556,7 @@
       "main": [
         [
           {
-            "node": "图表生成",
+            "node": "echart generate",
             "type": "main",
             "index": 0
           }
@@ -579,19 +567,35 @@
       "ai_outputParser": [
         [
           {
-            "node": "图表生成",
+            "node": "echart generate",
             "type": "ai_outputParser",
             "index": 0
           }
         ]
       ]
     },
-    "图表生成": {
+    "exclude Fields": {
       "main": [
         [
           {
-            "node": "Edit Fields",
+            "node": "Code",
             "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "echart generate": {
+      "main": [
+        []
+      ]
+    },
+    "QuickChart MCP": {
+      "ai_tool": [
+        [
+          {
+            "node": "echart generate",
+            "type": "ai_tool",
             "index": 0
           }
         ]
@@ -602,7 +606,7 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "20330d9a-c1c1-477b-8249-95dc9fb201b1",
+  "versionId": "405b42de-876c-4321-8bb1-cd46dc631f8d",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "d8ae7ad22b1c354fe97e82fd863f57343081e47461563dc2ec5d3f89a7b83371"

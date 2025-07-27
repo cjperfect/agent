@@ -5,10 +5,11 @@ services:
     image: n8nio/n8n
     ports:
       - "5678:5678"
-    # volumes:
-    #   - C:/Users/ChenJiang/Desktop/agent/data:/data
-      # - C:/Users/DELL/Desktop/data-agent/n8n_agent/data:/data
+    volumes:
+      - C:/Users/ChenJiang/Desktop/agent/data:/data
+    # - C:/Users/DELL/Desktop/data-agent/n8n_agent/data:/data
     environment:
       - N8N_BASIC_AUTH_ACTIVE=true
       - N8N_BASIC_AUTH_USER=admin
       - N8N_BASIC_AUTH_PASSWORD=admin
+      - N8N_FEATURE_FLAGS=communityNodes,mcpBeta

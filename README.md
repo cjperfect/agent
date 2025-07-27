@@ -1,6 +1,5 @@
 ## 环境要求 
-1. docker (n8n镜像)
-2. node
+1. node
 
 ## 项目启动
 
@@ -9,11 +8,18 @@
 2. 启动项目`pnpm dev`
 
 ### 工作流启动
-1. 进入n8n_agent文件夹, `main.json`为工作流文件, 导入到n8n当中
-2. 激活工作流即可
-3. 本地执行docker命令`docker compose up -d`, 启动工作流
+1. 本地执行`npx n8n`, 安装n8n并启动项目
+2. 安装MCP社区节点
+3. 进入n8n_agent文件夹, `main.json`为工作流文件, 导入到n8n当中
+4. 激活工作流即可
 
-**截图**
+---
+
+**安装MCP社区节点截图**
+
+![MCP](./snippets/install-mcp.png)
+
+**导入、激活工作流截图**
 
 ![截图](./snippets/main.png)
 

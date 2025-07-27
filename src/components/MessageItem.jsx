@@ -3,7 +3,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import ChartView from "./ChartView";
 
-const MessageItem = ({ role, content, echartsConfig }) => {
+const MessageItem = ({ role, content, echartsConfig, fileLink }) => {
   const isUser = role === "user";
   const [showFullContent, setShowFullContent] = useState(false);
   const [fullVisible, setFullVisible] = useState(false); // 控制DOM挂载
@@ -131,12 +131,21 @@ const MessageItem = ({ role, content, echartsConfig }) => {
                 {/* 全屏弹窗中的图表 */}
                 {echartsConfig && Array.isArray(echartsConfig) && echartsConfig.length > 0 && (
                   <div className="mt-6 space-y-6 prose">
-                    <h3 class="pl-2"> 🔍 图表分析</h3>
+                    <h3 className="pl-2"> 🔍 图表分析</h3>
                     {echartsConfig.map((chartConfig, index) => (
                       <div key={index} className="bg-white rounded-lg p-4 shadow-sm">
                         <ChartView config={chartConfig} />
                       </div>
                     ))}
+                  </div>
+                )}
+
+                {/* 文件下载链接 */}
+                {fileLink && (
+                  <div className="mt-4">
+                    <a href={fileLink} target="_blank" className="text-blue-500 text-lg font-bold">
+                      点击下载Excel
+                    </a>
                   </div>
                 )}
               </div>

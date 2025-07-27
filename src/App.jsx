@@ -6,7 +6,7 @@ import ChatInput from "./components/ChatInput";
 import TableView from "./components/TableView";
 import * as XLSX from "xlsx";
 import { AnimatePresence } from "framer-motion";
-import { defaultConfig } from "./config";
+import { defaultConfig, defaultConfig2 } from "./config";
 
 const URL = "http://localhost:5678/webhook/b98afb4f-8822-4b65-8634-fdd550dd46b0/chat";
 
@@ -22,6 +22,18 @@ const App = () => {
       id: 1753503484384.542,
       role: "assistant",
       ...defaultConfig,
+    },
+    {
+      id: 1753503484384.543,
+      role: "user",
+      content: `小明, 语文80, 数学80, 英语60
+小红, 语文90, 数学60, 英语70
+生成Excel`,
+    },
+    {
+      id: 1753503484384.544,
+      role: "assistant",
+      ...defaultConfig2,
     },
   ]);
   const [loading, setLoading] = useState(false);
@@ -95,6 +107,7 @@ const App = () => {
               ...newMsgs[i],
               content: output?.content || "",
               echartsConfig: output?.echartsOption || null,
+              fileLink: output?.fileLink || null,
             };
             break;
           }
@@ -191,6 +204,7 @@ const App = () => {
                 ...msg,
                 content: output.content || "",
                 echartsConfig: output?.echartsOption || null,
+                fileLink: output?.fileLink || null,
               }
             : msg
         )

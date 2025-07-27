@@ -66,28 +66,28 @@
 }
 
 /* 强化 markdown 标题大小和间距 */
-.prose h1 {
+.fullScreen-show .prose h1 {
   font-size: 2.25rem !important;
   margin: 0.8em 0 0.4em !important;
   font-weight: 800 !important;
 }
-.prose h2 {
+.fullScreen-show .prose h2 {
   font-size: 1.5rem !important;
   margin: 0.6em 0 0.3em !important;
   font-weight: 700 !important;
 }
-.prose h3 {
+.fullScreen-show .prose h3 {
   font-size: 1.25rem !important;
   margin: 0.5em 0 0.25em !important;
   font-weight: 600 !important;
 }
-.prose p {
-  margin: 0.2em 0 !important;
+.fullScreen-show .prose p {
+  margin: 1em 0 !important;
 }
-.prose ul,
-.prose ol {
+.fullScreen-show .prose ul,
+.fullScreen-show .prose ol {
   margin: 0.1em 0 0.1em 1.2em !important;
 }
-.prose li {
-  margin: 0.02em 0 !important;
+.fullScreen-show .prose li {
+  margin: 1em 0 !important;
 }

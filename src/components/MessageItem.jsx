@@ -9,8 +9,8 @@ const MessageItem = ({ role, content, echartsConfig, fileLink }) => {
   const [fullVisible, setFullVisible] = useState(false); // 控制DOM挂载
   const [animatingIn, setAnimatingIn] = useState(false); // 控制入场动画
   const contentLength = content.length;
-  const shouldShowMore = !isUser && contentLength > 200;
-  const displayContent = shouldShowMore && !showFullContent ? content.slice(0, 200) + "..." : content;
+  const shouldShowMore = !isUser && contentLength > 120;
+  const displayContent = shouldShowMore && !showFullContent ? content.slice(0, 120) + "..." : content;
   const closeTimeout = useRef();
 
   // ESC键关闭弹窗
@@ -61,7 +61,7 @@ const MessageItem = ({ role, content, echartsConfig, fileLink }) => {
             content
           ) : (
             <>
-              <div className="prose prose-sm max-w-none prose-h1:text-2xl prose-h2:text-xl prose-h3:text-lg prose-p:my-0.5 prose-h1:my-2 prose-h2:my-1.5 prose-h3:my-1 prose-ul:my-0.5 prose-ol:my-0.5 prose-li:my-0 prose-pre:my-0.5 prose-table:my-0.5 prose-blockquote:my-0.5 prose-hr:my-1">
+              <div className="prose prose-sm max-w-none">
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>{displayContent}</ReactMarkdown>
               </div>
 
@@ -95,7 +95,7 @@ const MessageItem = ({ role, content, echartsConfig, fileLink }) => {
       {/* 全屏弹窗，动画右进左出 */}
       {fullVisible && (
         <div
-          className={`fixed inset-0 z-50 bg-black/50 backdrop-blur-sm transition-opacity duration-300`}
+          className={`fullScreen-show fixed inset-0 z-50 bg-black/50 backdrop-blur-sm transition-opacity duration-300`}
           onClick={handleCloseFull}
         >
           <div

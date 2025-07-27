@@ -6,9 +6,9 @@ const Header = () => (
       <div className="flex justify-center items-center w-10 h-10 bg-white bg-opacity-80 rounded-full shadow-md">
         <span className="text-2xl font-bold text-purple-600">🤖</span>
       </div>
-      <h1 className="text-2xl font-extrabold tracking-wide text-white drop-shadow-lg">ChatGPT Plus</h1>
+      <h1 className="text-2xl font-extrabold tracking-wide text-white drop-shadow-lg">Breo 数据分析</h1>
     </div>
   </header>
 );
 
-export default Header; 
+export default Header;

@@ -71,7 +71,7 @@ const App = () => {
   const handleSend = async (text) => {
     setMessages((msgs) => [...msgs, { role: "user", content: text }]);
     // 先插入一个空的 assistant 消息
-    setMessages((msgs) => [...msgs, { role: "assistant", content: "" }]);
+    setMessages((msgs) => [...msgs, { role: "assistant", content: "分析中..." }]);
     setLoading(true);
     try {
       const res = await fetch(URL, {

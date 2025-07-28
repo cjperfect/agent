@@ -61,7 +61,7 @@ const MessageItem = ({ role, content, echartsConfig, fileLink }) => {
             content
           ) : (
             <>
-              <div className="prose prose-sm max-w-none">
+              <div className="max-w-none prose prose-sm">
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>{displayContent}</ReactMarkdown>
               </div>
 
@@ -77,7 +77,7 @@ const MessageItem = ({ role, content, echartsConfig, fileLink }) => {
               {shouldShowMore && !showFullContent && (
                 <button
                   onClick={handleShowFull}
-                  className="mt-2 px-3 py-1 text-sm text-purple-600 hover:text-purple-800 bg-purple-100 hover:bg-purple-200 rounded-full transition-colors"
+                  className="px-3 py-1 mt-2 text-sm text-purple-600 bg-purple-100 rounded-full transition-colors hover:text-purple-800 hover:bg-purple-200"
                 >
                   查看更多
                 </button>
@@ -95,7 +95,7 @@ const MessageItem = ({ role, content, echartsConfig, fileLink }) => {
       {/* 全屏弹窗，动画右进左出 */}
       {fullVisible && (
         <div
-          className={`fullScreen-show fixed inset-0 z-50 bg-black/50 backdrop-blur-sm transition-opacity duration-300`}
+          className={`fixed inset-0 z-50 backdrop-blur-sm transition-opacity duration-300 fullScreen-show bg-black/50`}
           onClick={handleCloseFull}
         >
           <div
@@ -105,16 +105,16 @@ const MessageItem = ({ role, content, echartsConfig, fileLink }) => {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex flex-col h-full">
-              <div className="flex justify-between items-center px-6 py-4 bg-gradient-to-r from-purple-500 to-pink-400 text-white shadow-lg">
+              <div className="flex justify-between items-center px-6 py-4 text-white bg-gradient-to-r from-purple-500 to-pink-400 shadow-lg">
                 <h2 className="text-xl font-bold">详细内容</h2>
                 <button
                   onClick={handleCloseFull}
-                  className="p-2 hover:bg-white/20 rounded-full transition-colors duration-200"
+                  className="p-2 rounded-full transition-colors duration-200 hover:bg-white/20"
                   title="关闭 (ESC)"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="h-6 w-6"
+                    className="w-6 h-6"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -123,7 +123,7 @@ const MessageItem = ({ role, content, echartsConfig, fileLink }) => {
                   </svg>
                 </button>
               </div>
-              <div className="flex-1 overflow-y-auto p-6 bg-gray-50">
+              <div className="overflow-y-auto flex-1 p-6 bg-gray-50">
                 <div className="prose prose-sm max-w-none bg-white rounded-lg p-6 shadow-sm prose-h1:text-2xl prose-h2:text-xl prose-h3:text-lg prose-p:my-1 prose-h1:my-3 prose-h2:my-2 prose-h3:my-1 prose-ul:my-1 prose-ol:my-1 prose-li:my-0.5 prose-pre:my-1 prose-table:my-1">
                   <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
                 </div>
@@ -133,7 +133,7 @@ const MessageItem = ({ role, content, echartsConfig, fileLink }) => {
                   <div className="mt-6 space-y-6 prose">
                     <h3 className="pl-2"> 🔍 图表分析</h3>
                     {echartsConfig.map((chartConfig, index) => (
-                      <div key={index} className="bg-white rounded-lg p-4 shadow-sm">
+                      <div key={index} className="p-4 bg-white rounded-lg shadow-sm">
                         <ChartView config={chartConfig} />
                       </div>
                     ))}
@@ -143,7 +143,7 @@ const MessageItem = ({ role, content, echartsConfig, fileLink }) => {
                 {/* 文件下载链接 */}
                 {fileLink && (
                   <div className="mt-4">
-                    <a href={fileLink} target="_blank" className="text-blue-500 text-lg font-bold">
+                    <a href={fileLink} download={'数据表.xlsx'} target="_blank" className="text-lg font-bold text-blue-500">
                       点击下载Excel
                     </a>
                   </div>

@@ -8,7 +8,7 @@ import * as XLSX from "xlsx";
 import { AnimatePresence } from "framer-motion";
 import { defaultConfig, defaultConfig2 } from "./config";
 
-const URL = "http://localhost:5678/webhook/b98afb4f-8822-4b65-8634-fdd550dd46b0/chat";
+const URL = "http://192.168.104.57:5678/webhook/b98afb4f-8822-4b65-8634-fdd550dd46b0/chat";
 
 const sessionId = +new Date();
 
